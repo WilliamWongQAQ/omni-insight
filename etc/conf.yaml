@@ -1,0 +1,8 @@
+working_dir: /opt/omni-workspace
+sig_list: /etc/omni-insight/all_sigs.json
+release_list: /etc/omni-insight/releases.json
+db_server: {your db server IP}
+db_port: 3306
+db_user: {your DB user}
+db_password: {your DB password}
+db_name: openEuler-community-data
