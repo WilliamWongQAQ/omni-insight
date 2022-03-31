@@ -21,8 +21,8 @@ python3 setup.py install
 
 2. Using pip(currently you should download the release manually):
 ```shell
-wget https://github.com/omnibuildplatform/omni-insight/releases/download/v0.1.1/omniimager-0.1.1.tar.gz
-pip3 install --prefix / ./omniimager-0.1.1.tar.gz
+wget https://github.com/omnibuildplatform/omni-insight/releases/download/v0.1.1/omniinsight-0.1.1.tar.gz
+pip3 install --prefix / ./omniinsight-0.1.1.tar.gz
 ```
 
 3. Modify the config file in `/etc/omni-insight/conf.yaml` to match your environment.
