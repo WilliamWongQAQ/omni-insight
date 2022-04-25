@@ -57,7 +57,7 @@ def prepare_runserver(config_options):
     if target_releases:
         # insert into rpms table
         projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
-        rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
+        rpms_dict = rpm_parser.process_rpms(list(target_releases), project_dict)
         for rpm_list in rpms_dict.values():
             db.add_rpms(rpm_list, engine)
     # insert into sigs table
