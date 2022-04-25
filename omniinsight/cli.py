@@ -5,7 +5,6 @@ import prettytable as pt
 import omniinsight.insight as insight
 import omniinsight.utils as utils
 
-
 app = Flask(__name__)
 
 
@@ -74,6 +73,18 @@ def get(resource_type, resource_id, config_file):
         print(tb)
 
 
+@click.command()
+@click.option('--config-file', help='Configuration file for the software')
+def runserver(config_file):
+    config_options = utils.check_and_load_config(config_file)
+    print('Preparing and checking database for runserver...')
+    insight.prepare_runserver(config_options)
+    # runserver
+    cmd = 'uwsgi --ini /etc/omni-insight/insight.ini'
+    print(utils.run_cmd(cmd))
+
+
+
 @click.group()
 def cli():
     pass
@@ -83,4 +94,5 @@ def main():
     cli.add_command(load)
     cli.add_command(list)
     cli.add_command(get)
+    cli.add_command(runserver)
     cli()
