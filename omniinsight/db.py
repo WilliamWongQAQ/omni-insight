@@ -6,9 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy_utils import database_exists, create_database
 
-
 from omniinsight.objs import RpmData, SigData
-
 
 Base = declarative_base()
 
@@ -91,6 +89,19 @@ def prepare_database(config_options, database):
         Base.metadata.create_all(engine)
 
 
+def query_rpm_all_releases(engine):
+    result_list = []
+    with engine.connect() as conn:
+        sql = 'select distinct oe_release from rpms'
+        cursor = conn.execute(sql)
+        results = cursor.fetchall()
+        if not results:
+            for result in results:
+                release = result[0]
+                result_list.append(release)
+    return result_list
+
+
 def add_rpm(rpm, engine):
     new_rpm = RPMS(
         id=rpm.id, name=rpm.name, arch=rpm.arch, short_name=rpm.short_name,
@@ -143,9 +154,9 @@ def query_rpms(engine, sig, release, arch):
     result = []
 
     if arch == 'aarch64':
-        db_objs = session.query(RPMS).filter(RPMS.sig == sig).\
-            filter(RPMS.oe_release == release).\
-            filter(or_(RPMS.arch == 'aarch64', RPMS.arch == 'noarch')).\
+        db_objs = session.query(RPMS).filter(RPMS.sig == sig). \
+            filter(RPMS.oe_release == release). \
+            filter(or_(RPMS.arch == 'aarch64', RPMS.arch == 'noarch')). \
             all()
     elif arch == 'x86_64':
         db_objs = session.query(RPMS).filter(RPMS.sig == sig). \
@@ -211,3 +222,4 @@ def query_sig(engine, name):
 
     db_obj = session.query(SIGS).filter(SIGS.name == name).one()
     return sig_mapper(db_obj)
+
