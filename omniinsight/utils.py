@@ -1,5 +1,6 @@
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -22,6 +23,7 @@ def clean_up_dir(target_dir):
 
 
 def prepare_workspace(config_options):
+    print('Preparing workspace...')
     work_dir = config_options['working_dir']
     clean_up_dir(work_dir)
     os.makedirs(work_dir)
@@ -29,7 +31,7 @@ def prepare_workspace(config_options):
     verbose = False
     if config_options.get('debug'):
         verbose = True
-
+    print('Done!')
     return work_dir, verbose
 
 
@@ -60,3 +62,11 @@ def check_and_load_config(config_file):
         config_options = yaml.load(config_file, Loader=yaml.SafeLoader)
 
     return config_options
+
+
+def run_cmd(cmd):
+    """run linux cmd"""
+    cmd = shlex.split(cmd)
+    res = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    sout = res.communicate()
+    return res.returncode, sout[0].decode()
