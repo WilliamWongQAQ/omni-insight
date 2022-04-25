@@ -54,13 +54,12 @@ def prepare_runserver(config_options):
     old_releases = db.query_rpm_all_releases(engine)
     target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
     target_releases = set(target_releases) - set(old_releases)
-
-    # insert into rpms table
-    projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
-    rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
-    for rpm_list in rpms_dict.values():
-        db.add_rpms(rpm_list, engine)
-
+    if target_releases:
+        # insert into rpms table
+        projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
+        rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
+        for rpm_list in rpms_dict.values():
+            db.add_rpms(rpm_list, engine)
     # insert into sigs table
     sigs = project_parser.parse_sigs(community_dir + '/sig/')
     for sig in sigs:
