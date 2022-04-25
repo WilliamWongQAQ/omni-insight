@@ -2,12 +2,10 @@ from flask import Flask, request
 import prettytable as pt
 import sys
 
-
 import omniinsight.db as db
 import omniinsight.project_parser as project_parser
 import omniinsight.rpm_parser as rpm_parser
 import omniinsight.utils as utils
-
 
 CONFIG_FILE = '/etc/omni-insight/conf.yaml'
 
@@ -17,6 +15,7 @@ app = Flask(__name__)
 
 
 def do_load(resource_type, config_options):
+    """when users execute script themselves to load data,the method will be used."""
     workdir, debug = utils.prepare_workspace(config_options)
     db.prepare_database(config_options, config_options['db_name'])
 
@@ -44,6 +43,30 @@ def do_load(resource_type, config_options):
             db.add_sig(sig, engine)
 
 
+def prepare_runserver(config_options):
+    """prepare for runserver """
+    workdir, debug = utils.prepare_workspace(config_options)
+    db.prepare_database(config_options, config_options['db_name'])
+    # Clone openeuler/community repo and parse sig information
+    COMMUNITY_URL = "https://gitee.com/openeuler/community.git"
+    community_dir = utils.clone_source(COMMUNITY_URL, workdir, 'community')
+    engine = db.init_connections(config_options, config_options['db_name'])
+    old_releases = db.query_rpm_all_releases(engine)
+    target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
+    target_releases = set(target_releases) - set(old_releases)
+
+    # insert into rpms table
+    projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
+    rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
+    for rpm_list in rpms_dict.values():
+        db.add_rpms(rpm_list, engine)
+
+    # insert into sigs table
+    sigs = project_parser.parse_sigs(community_dir + '/sig/')
+    for sig in sigs:
+        db.add_sig(sig, engine)
+
+
 def do_list(resource_type, config_options, release_name=None, sig_name=None, arch=None, api_call=False):
     engine = db.init_connections(config_options, config_options['db_name'])
 
@@ -51,7 +74,7 @@ def do_list(resource_type, config_options, release_name=None, sig_name=None, arc
         for option in [(release_name, 'release name'),
                        (sig_name, 'sig name'),
                        (arch, 'architecture')]:
-             utils.check_option(option[0], option[1])
+            utils.check_option(option[0], option[1])
 
         valid_arch = ['x86_64', 'aarch64', 'all']
         if arch not in valid_arch:
@@ -70,7 +93,6 @@ def do_list(resource_type, config_options, release_name=None, sig_name=None, arc
         sigs = db.query_sigs(engine)
 
         return sigs
-
 
 
 def load(resource_type, config_file):
@@ -152,5 +174,3 @@ def list_rpms():
         for rpm in rpms:
             rpm_list.append({'short-name': rpm.short_name})
     return {'rpms': rpm_list}
-
-
