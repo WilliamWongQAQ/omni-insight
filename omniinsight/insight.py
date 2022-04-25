@@ -54,6 +54,8 @@ def prepare_runserver(config_options):
     old_releases = db.query_rpm_all_releases(engine)
     target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
     target_releases = set(target_releases) - set(old_releases)
+    print('---------------------------------------------------------------------------')
+    print(target_releases)
     if target_releases:
         # insert into rpms table
         projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
