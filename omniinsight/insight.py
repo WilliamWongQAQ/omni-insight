@@ -51,21 +51,22 @@ def prepare_runserver(config_options):
     COMMUNITY_URL = "https://gitee.com/openeuler/community.git"
     community_dir = utils.clone_source(COMMUNITY_URL, workdir, 'community')
     engine = db.init_connections(config_options, config_options['db_name'])
+    print("Checking if there are releases installed...")
     old_releases = db.query_rpm_all_releases(engine)
     target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
-    print('-------------------target_releases-----------')
-    print(target_releases)
     target_releases = set(target_releases) - set(old_releases)
-    print('-------------------old_releases-----------')
-    print(old_releases)
-    print('------------target_releases--old_releases-----------------------')
-    print(target_releases)
     if target_releases:
+        release_log = ''
+        for target_release in target_releases:
+            release_log = target_release + ','
+        print(f'Uninstalled releases is detected:{release_log}, loading them...')
         # insert into rpms table
         projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
         rpms_dict = rpm_parser.process_rpms(list(target_releases), project_dict)
         for rpm_list in rpms_dict.values():
             db.add_rpms(rpm_list, engine)
+    else:
+        print(f'No rpms is need to load.')
     # insert into sigs table
     sigs = project_parser.parse_sigs(community_dir + '/sig/')
     for sig in sigs:
