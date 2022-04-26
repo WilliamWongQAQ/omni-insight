@@ -95,7 +95,7 @@ def query_rpm_all_releases(engine):
         sql = 'select distinct oe_release from rpms'
         cursor = conn.execute(sql)
         results = cursor.fetchall()
-        if not results:
+        if results:
             for result in results:
                 release = result[0]
                 result_list.append(release)
