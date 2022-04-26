@@ -14,3 +14,4 @@ RUN curl -L https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pi
 COPY --chown=root ./etc/ /etc/omni-insight/
 
 ENTRYPOINT ["uwsgi", "--ini", "/etc/omni-insight/insight.ini"]
+ENTRYPOINT ["omni-insight", "--config-file", "/etc/omni-insight/conf.yaml"]

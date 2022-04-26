@@ -24,6 +24,8 @@ def clean_up_dir(target_dir):
 
 def prepare_workspace(config_options):
     print('Preparing workspace...')
+    # delete caches,or it will cause errors.
+    os.system('rm -rf /tmp/omni-insight-cache/')
     work_dir = config_options['working_dir']
     clean_up_dir(work_dir)
     os.makedirs(work_dir)
@@ -60,7 +62,7 @@ def check_and_load_config(config_file):
 
     with open(config_file, 'r') as config_file:
         config_options = yaml.load(config_file, Loader=yaml.SafeLoader)
-
+    config_options['working_dir'] = format_path(config_options['working_dir'])
     return config_options
 
 
@@ -70,3 +72,10 @@ def run_cmd(cmd):
     res = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     sout = res.communicate()
     return res.returncode, sout[0].decode()
+
+
+def format_path(path):
+    sep = path[-1]
+    if sep == '/':
+        path = path[0:len(path) - 1]
+    return path
