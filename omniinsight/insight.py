@@ -23,23 +23,22 @@ def do_load(resource_type, config_options):
     COMMUNITY_URL = "https://gitee.com/openeuler/community.git"
 
     community_dir = utils.clone_source(COMMUNITY_URL, workdir, 'community')
-
+    engine = db.init_connections(config_options, config_options['db_name'])
     if resource_type == 'rpms':
         projects, project_dict = project_parser.parse_projects(community_dir + '/sig/')
 
         target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
 
         rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
-
+        db.truncate_rpms_table(engine)
         for rpm_list in rpms_dict.values():
-            engine = db.init_connections(config_options, config_options['db_name'])
+            # engine = db.init_connections(config_options, config_options['db_name'])
             db.add_rpms(rpm_list, engine)
 
     elif resource_type == 'sigs':
         sigs = project_parser.parse_sigs(community_dir + '/sig/')
-
         for sig in sigs:
-            engine = db.init_connections(config_options, config_options['db_name'])
+            # engine = db.init_connections(config_options, config_options['db_name'])
             db.add_sig(sig, engine)
 
 

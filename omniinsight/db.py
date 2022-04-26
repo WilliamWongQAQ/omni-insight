@@ -118,6 +118,13 @@ def add_rpm(rpm, engine):
     session.close()
 
 
+def truncate_rpms_table(engine):
+    with engine.connect() as conn:
+        sql = 'truncate table rpms'
+        conn.execute(sql)
+
+
+
 def add_rpms(rpms, engine):
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -222,4 +229,3 @@ def query_sig(engine, name):
 
     db_obj = session.query(SIGS).filter(SIGS.name == name).one()
     return sig_mapper(db_obj)
-
