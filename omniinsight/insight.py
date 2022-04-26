@@ -53,7 +53,9 @@ def prepare_runserver(config_options):
     engine = db.init_connections(config_options, config_options['db_name'])
     old_releases = db.query_rpm_all_releases(engine)
     target_releases = utils.parse_yaml_list(config_options['release_list'], keyword='releases')
+    print(target_releases)
     target_releases = set(target_releases) - set(old_releases)
+    print(old_releases)
     print('---------------------------------------------------------------------------')
     print(target_releases)
     if target_releases:
