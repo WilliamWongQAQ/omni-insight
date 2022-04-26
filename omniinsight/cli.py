@@ -1,3 +1,5 @@
+import os
+
 import click
 from flask import Flask
 import prettytable as pt
@@ -81,7 +83,7 @@ def runserver(config_file):
     insight.prepare_runserver(config_options)
     # runserver
     cmd = 'uwsgi -d --ini /etc/omni-insight/insight.ini'
-    print(utils.run_cmd(cmd))
+    os.system(cmd)
 
 
 
