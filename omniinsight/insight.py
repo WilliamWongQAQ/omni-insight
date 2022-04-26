@@ -31,15 +31,18 @@ def do_load(resource_type, config_options):
 
         rpms_dict = rpm_parser.process_rpms(target_releases, project_dict)
         db.truncate_rpms_table(engine)
+        print('Loading data into rpms table...')
         for rpm_list in rpms_dict.values():
             # engine = db.init_connections(config_options, config_options['db_name'])
             db.add_rpms(rpm_list, engine)
-
+        print('Done')
     elif resource_type == 'sigs':
         sigs = project_parser.parse_sigs(community_dir + '/sig/')
+        print('Loading data into sigs table...')
         for sig in sigs:
             # engine = db.init_connections(config_options, config_options['db_name'])
             db.add_sig(sig, engine)
+        print('Done')
 
 
 def prepare_runserver(config_options):
