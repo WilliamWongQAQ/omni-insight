@@ -82,6 +82,7 @@ def runserver(config_file):
     print('Preparing and checking database for runserver...')
     insight.prepare_runserver(config_options)
     # runserver
+    print("Running Server")
     cmd = 'uwsgi --ini /etc/omni-insight/insight.ini'
     os.system(cmd)
 
